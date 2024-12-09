@@ -9,7 +9,7 @@ import {
   TableRow,
   Pagination,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaEdit, FaSearch } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import ActorModal from "./ActorModal";
@@ -21,19 +21,24 @@ import {
   updateDocument,
 } from "../../../../services/firebaseService";
 import { imgPreview } from "../../../../utils/Constant";
-
+import {
+  NotificationContext,
+  useNotification,
+} from "../../../../context/NotificationProvider";
+import { ActorContext } from "../../../../context/ActorProvider";
 const inner = { name: "", imgUrl: imgPreview, descriptions: "" };
 
 function Actor(props) {
   const [actor, setActor] = useState(inner);
-  const [actors, setActors] = useState([]);
   const [errors, setErrors] = useState(inner);
   const [open, setOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [actorToDelete, setActorToDelete] = useState(inner);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [oldImg, setOldImg] = useState("");
+  const showNotification = useNotification();
+  const actors = useContext(ActorContext);
   const handleSearch = (e) => {
     setCurrentPage(1);
     setSearchTerm(e.target.value);
@@ -52,23 +57,12 @@ function Actor(props) {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      fetchDocumentsRealtime("Actors", (data) => {
-        setActors(data); // Cập nhật danh sách danh mục từ dữ liệu Firestore
-      });
-    } catch (error) {}
-  };
 
   const handleInput = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
     setActor({ ...actor, [name]: value });
-    console.log(`${name}: ${value}`);
+    // console.log(`${name}: ${value}`);
   };
 
   const handleClickOpen = () => {
@@ -82,12 +76,14 @@ function Actor(props) {
   };
 
   const handleDeleteClick = (item) => {
+    setOldImg(item.imgUrl);
     setActorToDelete(item);
     setIsDeleteOpen(true);
   };
 
   const handleEditClick = (item) => {
     setActor(item);
+    setOldImg(item.imgUrl);
     setOpen(true);
     setErrors(inner);
   };
@@ -100,20 +96,20 @@ function Actor(props) {
       : "Please enter description";
     if (actor.imgUrl === imgPreview) {
       newErrors.imgUrl = "Please provide an image URL";
-    } else {
-      newErrors.imgUrl = "";
     }
     setErrors(newErrors);
-    return newErrors.name || newErrors.descriptions || newErrors.imgUrl;
+    return newErrors.name || newErrors.descriptions;
   };
 
   const handleAddActor = async () => {
     if (validate()) return;
     try {
       if (actor.id) {
-        await updateDocument("Actors", actor, actor.id);
+        await updateDocument("Actors", actor, oldImg);
+        showNotification("Category updated successfully!", "info");
       } else {
         await addDocument("Actors", actor);
+        showNotification("Category added successfully!", "info");
       }
       setActor(inner);
       setOpen(false);
@@ -124,7 +120,8 @@ function Actor(props) {
 
   const handleDeleteActor = async (id) => {
     try {
-      await deleteDocument("Actors", id);
+      await deleteDocument("Actors", id, oldImg);
+      showNotification("Category deleted successfully!", "info");
       setIsDeleteOpen(false);
     } catch (error) {
       console.error("Error deleting actor:", error);

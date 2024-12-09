@@ -41,12 +41,6 @@ function DeleteModal({ open, handleDelete, itemToDelete, handleClose }) {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-        message="Product deleted successfully"
-      />
     </div>
   );
 }

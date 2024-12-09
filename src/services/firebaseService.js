@@ -1,21 +1,42 @@
-import { 
-  collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, setDoc, getDoc 
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  onSnapshot,
+  query,
+  where,
+  setDoc,
+  getDoc,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { uploadImageToCloudinary, deleteImageFromCloudinary } from "../config/CloudinaryConfig";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import {
+  uploadImageToCloudinary,
+  deleteImageFromCloudinary,
+} from "../config/CloudinaryConfig";
 import { db, storage } from "../config/firebaseConfig";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 // Add a new document to a Firestore collection with optional image upload
 export const addDocument = async (collectionName, values) => {
   try {
     if (values.imgUrl) {
-      const imgUrl = await uploadImageToCloudinary(values.imgUrl, collectionName);
+      const imgUrl = await uploadImageToCloudinary(
+        values.imgUrl,
+        collectionName
+      );
       values.imgUrl = imgUrl;
     }
     await addDoc(collection(db, collectionName), values);
   } catch (error) {
-    console.error('Error adding document:', error);
+    console.error("Error adding document:", error);
     throw error;
   }
 };
@@ -42,10 +63,12 @@ export const deleteDocument = async (collectionName, docId, imgUrl) => {
   }
 
   // Delete the image from Cloudinary if it exists
-  if (imgUrl && imgUrl.includes('cloudinary.com')) {
+  if (imgUrl && imgUrl.includes("cloudinary.com")) {
     const publicId = imgUrl
-      .split('/').slice(-2).join('/')  // Get folder and file name
-      .replace(/\.[^/.]+$/, '');       // Remove file extension
+      .split("/")
+      .slice(-2)
+      .join("/") // Get folder and file name
+      .replace(/\.[^/.]+$/, ""); // Remove file extension
     await deleteImageFromCloudinary(publicId);
   }
 
@@ -53,25 +76,24 @@ export const deleteDocument = async (collectionName, docId, imgUrl) => {
   await deleteDoc(doc(collection(db, collectionName), docId));
 };
 
-// Update a Firestore document with optional image handling
-export const updateDocument = async (collectionName, values, imgUpload, oldImgUrl) => {
-  const { id, ...updatedValues } = values;
+// Update a document in a given collection with an optional image upload
+export const updateDocument = async (collectionName, values, oldImgUrl) => {
+  if (values.imgUrl) {
+    const imgUrl = await uploadImageToCloudinary(values.imgUrl, collectionName);
+    values.imgUrl = imgUrl;
 
-  if (imgUpload) {
-    const storageRef = ref(storage, `${collectionName}/${uuidv4()}`);
-    await uploadBytes(storageRef, imgUpload);
-    const imgUrl = await getDownloadURL(storageRef);
-    updatedValues.imgUrl = imgUrl;
-
-    // Delete the old image if it exists
-    if (oldImgUrl) {
-      const oldFilename = oldImgUrl.split('%2F').pop().split('?').shift();
-      const oldImgRef = ref(storage, `${collectionName}/${oldFilename}`);
-      await deleteObject(oldImgRef);
+    // Xóa ảnh trên Cloudinary nếu tồn tại
+    if (oldImgUrl && oldImgUrl.includes("cloudinary.com")) {
+      // Lấy `public_id` từ URL của Cloudinary
+      const publicId = oldImgUrl
+        .split("/")
+        .slice(-2)
+        .join("/") // Lấy thư mục và tên file từ URL
+        .replace(/\.[^/.]+$/, ""); // Loại bỏ phần mở rộng file (ví dụ: .jpg, .png)
+      await deleteImageFromCloudinary(publicId);
     }
   }
-
-  await updateDoc(doc(collection(db, collectionName), id), updatedValues);
+  await updateDoc(doc(collection(db, collectionName), values.id), values);
 };
 
 // Handle file input changes and set image data URL

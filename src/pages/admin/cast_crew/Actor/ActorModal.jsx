@@ -57,10 +57,6 @@ function ActorModal({
             onChange={(e) => handleFileChange(e, setActor, actor)}
             inputProps={{ accept: "image/*" }}
           />
-
-          <Typography className="block" variant="caption" color="error">
-            {errors.imgUrl}
-          </Typography>
           <Card sx={{ maxWidth: 300, maxHeight: 300, marginTop: 2 }}>
             {
               <CardMedia

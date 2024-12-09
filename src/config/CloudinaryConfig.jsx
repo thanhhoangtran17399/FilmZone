@@ -30,9 +30,9 @@ export const uploadImageToCloudinary = async (imgFile, folderName) => {
 // Function to delete an image from Cloudinary
 export const deleteImageFromCloudinary = async (publicId) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
-  const apiKey = "957659142363954"; // Replace with your actual API key
-  const apiSecret = "QXAJjoLAv8THFUqsQAVW1OgJGDk"; // Replace with your actual API secret
-  const cloudName = "dymypfkt4"; // Replace with your actual Cloudinary cloud name
+  const apiKey = "524124677196698"; // Replace with your actual API key
+  const apiSecret = "dgoiwk0TgyLUXwX1hZUhZir5dU0"; // Replace with your actual API secret
+  const cloudName = "drnxq3wgz"; // Replace with your actual Cloudinary cloud name
 
   // Generate the signature for authentication
   const signature = CryptoJS.SHA1(
