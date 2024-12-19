@@ -109,7 +109,7 @@ function Actor(props) {
         showNotification("Category updated successfully!", "info");
       } else {
         await addDocument("Actors", actor);
-        showNotification("Category added successfully!", "info");
+        showNotification("Category added successfully!", "success");
       }
       setActor(inner);
       setOpen(false);
@@ -121,7 +121,7 @@ function Actor(props) {
   const handleDeleteActor = async (id) => {
     try {
       await deleteDocument("Actors", id, oldImg);
-      showNotification("Category deleted successfully!", "info");
+      showNotification("Actor deleted successfully!", "warning");
       setIsDeleteOpen(false);
     } catch (error) {
       console.error("Error deleting actor:", error);
