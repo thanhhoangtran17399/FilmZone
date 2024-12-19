@@ -9,7 +9,7 @@ import {
   TableRow,
   Pagination,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaEdit, FaSearch } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import CategoryModal from "./CategoryModal";
@@ -20,18 +20,18 @@ import {
   updateDocument,
 } from "../../../services/firebaseService";
 import DeleteModal from "../../../components/DeleteModal";
+import { CategoriesContext } from "../../../context/CategoriesProvider";
 
 const inner = { name: "", descriptions: "" };
 function Categories(props) {
   const [category, setCategory] = useState(inner);
-  const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState(inner);
   const [open, setOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(inner);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const categories = useContext(CategoriesContext);
   const handleSearch = (e) => {
     setCurrentPage(1);
     setSearchTerm(e.target.value);
@@ -50,18 +50,6 @@ function Categories(props) {
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      fetchDocumentsRealtime("Categories", (data) => {
-        setCategories(data); // Cập nhật danh sách danh mục từ dữ liệu Firestore
-      });
-    } catch (error) {}
   };
 
   const handleClickOpen = () => {

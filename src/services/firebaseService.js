@@ -24,7 +24,6 @@ import {
 import { db, storage } from "../config/firebaseConfig";
 import { v4 as uuidv4 } from "uuid";
 
-// Add a new document to a Firestore collection with optional image upload
 export const addDocument = async (collectionName, values) => {
   try {
     if (values.imgUrl) {
@@ -41,7 +40,6 @@ export const addDocument = async (collectionName, values) => {
   }
 };
 
-// Fetch documents in real-time from a Firestore collection
 export const fetchDocumentsRealtime = (collectionName, callback) => {
   const collectionRef = collection(db, collectionName);
 
@@ -56,27 +54,23 @@ export const fetchDocumentsRealtime = (collectionName, callback) => {
   return unsubscribe;
 };
 
-// Delete a document from Firestore and optionally remove its image from Cloudinary
 export const deleteDocument = async (collectionName, docId, imgUrl) => {
   if (!docId) {
     throw new Error("Document ID is required for deletion");
   }
 
-  // Delete the image from Cloudinary if it exists
   if (imgUrl && imgUrl.includes("cloudinary.com")) {
     const publicId = imgUrl
       .split("/")
       .slice(-2)
-      .join("/") // Get folder and file name
-      .replace(/\.[^/.]+$/, ""); // Remove file extension
+      .join("/")
+      .replace(/\.[^/.]+$/, ""); 
     await deleteImageFromCloudinary(publicId);
   }
 
-  // Delete the document from Firestore
   await deleteDoc(doc(collection(db, collectionName), docId));
 };
 
-// Update a document in a given collection with an optional image upload
 export const updateDocument = async (collectionName, values, oldImgUrl) => {
   if (values.imgUrl) {
     const imgUrl = await uploadImageToCloudinary(values.imgUrl, collectionName);

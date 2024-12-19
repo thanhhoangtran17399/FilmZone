@@ -27,7 +27,7 @@ export const uploadImageToCloudinary = async (imgFile, folderName) => {
   }
 };
 
-// Function to delete an image from Cloudinary
+// Function to delete an image from Cloudinary  
 export const deleteImageFromCloudinary = async (publicId) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
   const apiKey = "524124677196698"; // Replace with your actual API key

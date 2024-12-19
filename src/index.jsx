@@ -6,15 +6,29 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { NotificationProvider } from "./context/NotificationProvider";
 import { ActorProvider } from "./context/ActorProvider";
+import { AuthorProvider } from "./context/AuthorProvider";
+import { CharacterProvider } from "./context/CharacterProvider";
+import { CategoriesProvider } from "./context/CategoriesProvider";
+import { PlansProvider } from "./context/PlansProvider";
+import ModalTest from "./pages/admin/media_management/movie/ModalTest";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
+  {/* <ModalTest></ModalTest> */}
     <NotificationProvider>
       <BrowserRouter>
-        <ActorProvider>
-          <App />
-        </ActorProvider>
+        <CategoriesProvider>
+          <CharacterProvider>
+            <AuthorProvider>
+              <ActorProvider>
+                <PlansProvider>
+                  <App />
+                </PlansProvider>
+              </ActorProvider>
+            </AuthorProvider>
+          </CharacterProvider>
+        </CategoriesProvider>
       </BrowserRouter>
     </NotificationProvider>
   </React.StrictMode>

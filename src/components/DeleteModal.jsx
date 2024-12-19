@@ -14,7 +14,7 @@ function DeleteModal({ open, handleDelete, itemToDelete, handleClose }) {
   const handleDeleteAndClose = (id) => {
     handleDelete(id);
     setOpenSnackbar(true); // Hiển thị thông báo sau khi xóa
-    handleClose(); // Đóng modal
+    handleClose();
   };
 
   return (

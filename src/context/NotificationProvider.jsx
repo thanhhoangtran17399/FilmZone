@@ -1,4 +1,3 @@
-// NotificationContext.js
 import React, { createContext, useState, useContext } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
