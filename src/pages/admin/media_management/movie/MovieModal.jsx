@@ -42,30 +42,6 @@ function MovieModal({ open, onClose, handleSavePlan }) {
   const handlePlanChange = (event) => setPlan(event.target.value);
   const handleRentChange = (event) => setRent(event.target.value);
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category]
-    );
-  };
-
-  const handleActorChange = (actor) => {
-    setSelectedActors((prev) =>
-      prev.includes(actor)
-        ? prev.filter((item) => item !== actor)
-        : [...prev, actor]
-    );
-  };
-
-  const handleCharacterChange = (character) => {
-    setSelectedCharacters((prev) =>
-      prev.includes(character)
-        ? prev.filter((item) => item !== character)
-        : [...prev, character]
-    );
-  };
-
   const handleClose = () => {
     onClose();
   };
@@ -142,7 +118,6 @@ function MovieModal({ open, onClose, handleSavePlan }) {
                         key={category}
                         u
                         variant="outlined"
-                        onClick={() => handleCategoryChange(category)}
                         className={
                           selectedCategory.includes(category)
                             ? "bg-blue-500 text-white"
@@ -163,7 +138,6 @@ function MovieModal({ open, onClose, handleSavePlan }) {
                   {["actor1", "actor2", "actor3"].map((actor) => (
                     <IconButton
                       key={actor}
-                      onClick={() => handleActorChange(actor)}
                       className={
                         selectedActors.includes(actor)
                           ? "bg-blue-500 text-white"
@@ -188,7 +162,6 @@ function MovieModal({ open, onClose, handleSavePlan }) {
                     (character) => (
                       <IconButton
                         key={character}
-                        onClick={() => handleCharacterChange(character)}
                         className={
                           selectedCharacters.includes(character)
                             ? "bg-blue-500 text-white"

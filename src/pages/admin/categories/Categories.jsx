@@ -70,7 +70,7 @@ function Categories(props) {
 
   const handleClose = () => {
     setOpen(false);
-    setCategory(inner); // Reset form khi đóng modal
+    setCategory(inner); 
   };
 
   const handleInput = (e) => {
