@@ -4,15 +4,15 @@ import { fetchDocumentsRealtime } from "../services/firebaseService";
 export const CategoriesContext = createContext();
 
 export const CategoriesProvider = ({ children }) => {
-  const [characters, setCharacters] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const fetchData = async () => {
     try {
-      fetchDocumentsRealtime("Characters", (data) => {
-        setCharacters(data);
+      fetchDocumentsRealtime("Categories", (data) => {
+        setCategories(data);
       });
     } catch (error) {
-      console.error("Error fetching characters:", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -21,7 +21,7 @@ export const CategoriesProvider = ({ children }) => {
   }, []);
 
   return (
-    <CategoriesContext.Provider value={characters}>
+    <CategoriesContext.Provider value={categories}>
       {children}
     </CategoriesContext.Provider>
   );
