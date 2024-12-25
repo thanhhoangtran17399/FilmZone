@@ -10,12 +10,11 @@ import { AuthorProvider } from "./context/AuthorProvider";
 import { CharacterProvider } from "./context/CharacterProvider";
 import { CategoriesProvider } from "./context/CategoriesProvider";
 import { PlansProvider } from "./context/PlansProvider";
-import ModalTest from "./pages/admin/media_management/movie/ModalTest";
+import ModalTest from "./components/ModalTest";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-  {/* <ModalTest></ModalTest> */}
     <NotificationProvider>
       <BrowserRouter>
         <CategoriesProvider>

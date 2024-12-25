@@ -70,7 +70,7 @@ function Categories(props) {
 
   const handleClose = () => {
     setOpen(false);
-    setCategory(inner); 
+    setCategory(inner);
   };
 
   const handleInput = (e) => {
@@ -93,11 +93,11 @@ function Categories(props) {
   const handleAddCategory = async () => {
     if (validate()) return;
     try {
-    if(category.id){
-      await updateDocument("Categories", category, category.id);
-    }else{
-      await addDocument("Categories", category);
-    }
+      if (category.id) {
+        await updateDocument("Categories", category, category.id);
+      } else {
+        await addDocument("Categories", category);
+      }
       setCategory(inner); // Reset form
       setOpen(false); // Đóng modal
     } catch (error) {
@@ -153,15 +153,17 @@ function Categories(props) {
                 </TableCell>
                 <TableCell align="left">{category.name}</TableCell>
                 <TableCell align="left">{category.descriptions}</TableCell>
-                <TableCell align="left" sx={{ display: "flex" }}>
-                  <FaEdit
-                    onClick={() => handleEditClick(category)}
-                    className="text-2xl text-emerald-700 cursor-pointer"
-                  />
-                  <MdDelete
-                    onClick={() => handleDeleteClick(category)}
-                    className="text-2xl text-red-500 cursor-pointer"
-                  />
+                <TableCell align="left">
+                  <div className="flex gap-3">
+                    <FaEdit
+                      onClick={() => handleEditClick(category)}
+                      className="text-2xl text-emerald-700 cursor-pointer"
+                    />
+                    <MdDelete
+                      onClick={() => handleDeleteClick(category)}
+                      className="text-2xl text-red-500 cursor-pointer"
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

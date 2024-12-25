@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import { FaUser } from "react-icons/fa";
 import { BiSolidCategory } from "react-icons/bi";
+import { PlansContext } from "../../../../context/PlansProvider";
+import { TiDelete } from "react-icons/ti";
+import { getObjectById } from "../../../../services/reponsitory";
+import { IoMdPhotos } from "react-icons/io";
 import {
   Button,
   FormControl,
@@ -17,8 +22,10 @@ import {
   Input,
   Card,
   CardMedia,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { AuthorContext } from "../../../../context/AuthorProvider";
 // import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 // Styled Paper Item component
@@ -30,18 +37,22 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function MovieModal({ open, onClose, handleSavePlan }) {
-  const [age, setAge] = useState("");
-  const [plan, setPlan] = useState("");
+function MovieModal({
+  open,
+  onClose,
+  handleSavePlan,
+  movie,
+  handleInput,
+  handleChoose,
+}) {
   const [rent, setRent] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedActors, setSelectedActors] = useState([]);
   const [selectedCharacters, setSelectedCharacters] = useState([]);
-
-  const handleChange = (event) => setAge(event.target.value);
-  const handlePlanChange = (event) => setPlan(event.target.value);
   const handleRentChange = (event) => setRent(event.target.value);
-
+  const plans = useContext(PlansContext);
+  const authors = useContext(AuthorContext);
+  console.log(plans);
   const handleClose = () => {
     onClose();
   };
@@ -68,6 +79,8 @@ function MovieModal({ open, onClose, handleSavePlan }) {
                 variant="outlined"
                 fullWidth
                 margin="normal"
+                multiline
+                rows={3}
               />
               <TextField
                 name="duration"
@@ -77,28 +90,71 @@ function MovieModal({ open, onClose, handleSavePlan }) {
                 margin="normal"
                 type="number"
               />
+
               <FormControl fullWidth margin="normal">
-                <InputLabel>Plan ID</InputLabel>
+                <FormControl fullWidth margin="normal">
+                  <Autocomplete
+                    options={authors} // Mảng các tác giả từ context
+                    getOptionLabel={(option) => option.name} // Hiển thị tên của tác giả
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Author"
+                        variant="outlined"
+                      />
+                    )}
+                    value={
+                      authors.find((author) => author.id === movie.authorID) ||
+                      null // Giá trị đã chọn
+                    }
+                    onChange={(event, newValue) => {
+                      handleInput({
+                        target: {
+                          name: "authorID",
+                          value: newValue ? newValue.id : "",
+                        }, // Cập nhật giá trị
+                      });
+                    }}
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
+                    } // So sánh tùy chọn và giá trị
+                    noOptionsText="No authors found" // Thông báo khi không có kết quả
+                  />
+                </FormControl>
+              </FormControl>
+
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Plan</InputLabel>
                 <Select
-                  value={plan}
-                  onChange={handlePlanChange}
-                  label="Plan ID"
+                  name="planID"
+                  label="Plan"
+                  value={movie.planID || ""}
+                  style={{ marginBottom: "16px" }}
+                  onChange={handleInput}
                 >
-                  <MenuItem value="Family">Family</MenuItem>
-                  <MenuItem value="Premium">Premium</MenuItem>
-                  <MenuItem value="Basic">Basic</MenuItem>
+                  <MenuItem value="">Select Plans</MenuItem>
+                  {plans
+                    ?.sort((a, b) => a.level - b.level)
+                    .map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.title}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
-              <TextField
-                name="rent"
-                label="Rent"
-                type="number"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={rent}
-                onChange={handleRentChange}
-              />
+
+              {getObjectById(movie.planID, plans)?.level >= 2 && (
+                <TextField
+                  name="rentalPrice"
+                  label="Rent"
+                  type="number"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={rent}
+                  onChange={handleRentChange}
+                />
+              )}
             </Item>
           </Grid>
 
@@ -107,84 +163,127 @@ function MovieModal({ open, onClose, handleSavePlan }) {
             <Item>
               {/* Categories Section */}
               <div className="mb-4">
-                <div className="flex gap-2 items-center ">
-                  <BiSolidCategory />
-                  <h3>Categories</h3>
+                <div
+                  className="flex gap-2 items-center cursor-pointer mb-2"
+                  onClick={() => handleChoose("categories")}
+                >
+                  <BiSolidCategory className="text-current  hover:text-indigo-800 transition duration-200" />
+                  <h3 className="text-current transition  hover:text-indigo-800 transition duration-200">
+                    Categories
+                  </h3>
                 </div>
-                <div className="flex space-x-2">
-                  {["Musical", "Action", "Drama", "Thriller"].map(
-                    (category) => (
-                      <Button
-                        key={category}
-                        u
-                        variant="outlined"
-                        className={
-                          selectedCategory.includes(category)
-                            ? "bg-blue-500 text-white"
-                            : ""
-                        }
-                      >
-                        {category}
-                      </Button>
-                    )
-                  )}
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    "Musical",
+                    "Action",
+                    "Drama",
+                    "Thriller",
+                    "Musical",
+                    "Action",
+                    "Drama",
+                    "Thriller",
+                  ].map((category) => (
+                    <span
+                      key={category}
+                      variant="outlined"
+                      className={`relative bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400${selectedCategory.includes(
+                        category
+                      )}`}
+                    >
+                      {category}
+                      <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
+                    </span>
+                  ))}
                 </div>
               </div>
 
               {/* Actors Section */}
               <div className="mb-4">
-                <h3>Actor</h3>
-                <div className="flex space-x-2">
+                <div
+                  className="flex gap-2 items-center cursor-pointer mb-2"
+                  onClick={() => handleChoose("actors")}
+                >
+                  <FaUser className="hover:text-indigo-800 transition duration-200" />
+                  <h3 className="hover:text-indigo-800 transition duration-200">
+                    Actor
+                  </h3>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
                   {["actor1", "actor2", "actor3"].map((actor) => (
-                    <IconButton
+                    <div
                       key={actor}
-                      className={
+                      className={`relative ${
                         selectedActors.includes(actor)
                           ? "bg-blue-500 text-white"
                           : ""
-                      }
+                      }`}
                     >
                       <img
                         src="https://www.ohchr.org/sites/default/files/styles/hero_image_2/public/2021-07/Ethiopia-UN0418425.jpg?itok=7wJB8CbZ"
                         alt={actor}
                         className="w-12 h-12 rounded-lg"
                       />
-                    </IconButton>
+                      <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
+                    </div>
                   ))}
                 </div>
               </div>
 
               {/* Characters Section */}
               <div className="mb-4">
-                <h3>Character</h3>
-                <div className="flex space-x-2">
-                  {["character1", "character2", "character3"].map(
-                    (character) => (
-                      <IconButton
-                        key={character}
-                        className={
-                          selectedCharacters.includes(character)
-                            ? "bg-blue-500 text-white"
-                            : ""
-                        }
-                      >
-                        <img
-                          src="https://www.ohchr.org/sites/default/files/styles/hero_image_2/public/2021-07/Ethiopia-UN0418425.jpg?itok=7wJB8CbZ"
-                          alt={character}
-                          className="w-12 h-12 rounded-lg"
-                        />
-                      </IconButton>
-                    )
-                  )}
+                <div
+                  className="flex gap-2 items-center cursor-pointer mb-2"
+                  onClick={() => handleChoose("characters")}
+                >
+                  <FaUser className=" hover:text-indigo-800 transition duration-200" />
+                  <h3 className=" hover:text-indigo-800 transition duration-200">
+                    Character
+                  </h3>
+                </div>
+                <div className="flex gap-2 flex-wrap ">
+                  {[
+                    "character1",
+                    "character2",
+                    "character3",
+                    "character1",
+                    "character2",
+                    "character3",
+                    "character1",
+                    "character2",
+                  ].map((character) => (
+                    <div
+                      key={character}
+                      className={`relative ${
+                        selectedCharacters.includes(character)
+                          ? "bg-blue-500 text-white"
+                          : ""
+                      }`}
+                    >
+                      <img
+                        src="https://www.ohchr.org/sites/default/files/styles/hero_image_2/public/2021-07/Ethiopia-UN0418425.jpg?itok=7wJB8CbZ"
+                        alt={character}
+                        className="w-12 h-12 rounded-lg"
+                      />
+                      <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Image Upload Section */}
-              <Input
-                type="file"
-                // onChange={(e) => handleFileChange(e, setCharacter, character)}
-                inputProps={{ accept: "image/*" }}
-              />
+              <label htmlFor="upload-photo">
+                <input
+                  style={{ display: "none" }}
+                  id="upload-photo"
+                  name="upload-photo"
+                  type="file"
+                  // onChange={handleImageChange}
+                />
+                <IconButton color="primary" component="span">
+                  <IoMdPhotos />
+                </IconButton>
+              </label>
               <Card sx={{ maxWidth: 300, maxHeight: 300, marginTop: 2 }}>
                 <CardMedia
                   component="img"
