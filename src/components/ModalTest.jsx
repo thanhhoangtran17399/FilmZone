@@ -9,22 +9,26 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import "tailwindcss/tailwind.css";
+import { handleFileChange } from "../services/firebaseService";
 
 const ModalDialog = ({
   openModalTest,
   handleCloseModalTest,
   dataChoose,
   chooseType,
+  handleSelect,
+  dataSelected,
 }) => {
   const [search, setSearch] = useState("");
   const filtered = dataChoose.filter((item) =>
     item?.name.toLowerCase().includes(search.toLowerCase())
   );
-  console.log(filtered);
-  console.log(dataChoose);
-  console.log(chooseType);
+  // console.log(filtered);
+  // console.log(dataChoose);
+  // console.log(chooseType);
 
   return (
     <Dialog open={openModalTest} onClose={handleCloseModalTest} maxWidth="md">
@@ -35,11 +39,20 @@ const ModalDialog = ({
             variant="h6"
             className="font-bold text-center sm:text-left mb-2 sm:mb-0"
           >
-            Choose Actors
+            {chooseType === "categories" && "Choose Categories"}
+            {chooseType === "characters" && "Choose characters"}
+            {chooseType === "actors" && "Choose Actors"}
           </Typography>
+
           <TextField
             variant="outlined"
-            placeholder="Search actors..."
+            placeholder={
+              chooseType === "categories"
+                ? "Search categories..."
+                : chooseType === "actors"
+                ? "Search actors..."
+                : "Search characters..."
+            }
             size="small"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -49,19 +62,32 @@ const ModalDialog = ({
       </DialogTitle>
 
       <DialogContent>
-        {/* Responsive Actors Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-y-auto max-h-64 border border-gray-200 rounded-lg shadow-inner p-4">
+        {/* Responsive Grid */}
+        <div className="flex gap-2 flex-wrap overflow-y-auto max-h-64 border border-gray-200 rounded-lg shadow-inner p-4">
           {dataChoose.length > 0 ? (
             filtered.map((item) =>
               chooseType === "categories" ? (
                 <>
-                  <div key={item.id} className="flex flex-col items-center">
-                    <Button>{item.name}</Button>
-                  </div>
+                  <button
+                    key={item.id}
+                    onClick={() => handleSelect(item.id)}
+                    type="button"
+                    className={`text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center ${
+                      dataSelected.includes(item.id)
+                        ? "ring-4 ring-cyan-300 dark:ring-cyan-800 bg-gradient-to-r from-purple-500 to-pink-500"
+                        : ""
+                    }`}
+                  >
+                    {item.name}
+                  </button>
                 </>
               ) : (
                 <>
-                  <div key={item.id} className="flex flex-col items-center">
+                  <div
+                    key={item.id}
+                    className="flex flex-col items-center px-2 font-semibold"
+                    onClick={() => handleSelect(item.id)}
+                  >
                     <Avatar
                       src={item.imgUrl}
                       alt="#"
@@ -82,7 +108,7 @@ const ModalDialog = ({
         </div>
 
         {/* Footer */}
-        <div className="text-right mt-4">
+        <DialogActions>
           <Button
             onClick={handleCloseModalTest}
             variant="outlined"
@@ -90,7 +116,7 @@ const ModalDialog = ({
           >
             Cancel
           </Button>
-        </div>
+        </DialogActions>
       </DialogContent>
     </Dialog>
   );

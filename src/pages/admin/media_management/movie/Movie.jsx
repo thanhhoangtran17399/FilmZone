@@ -33,6 +33,7 @@ const initialMovie = {
   imgUrl: "",
 };
 
+
 function Movie() {
   const [open, setOpen] = useState(false);
   const [openModalTest, setOpenModalTest] = useState(false);
@@ -83,6 +84,44 @@ function Movie() {
     setOpenModalTest(true);
   };
 
+  const handleSelect = (item) => {
+    setMovie((prevData) => {
+      let updatedList;
+      switch (chooseType) {
+        case "categories":
+          updatedList = toggleSelection(prevData.listCate, item);
+          return { ...prevData, listCate: updatedList };
+        case "actors":
+          updatedList = toggleSelection(prevData.listActor, item);
+          return { ...prevData, listActor: updatedList };
+        case "characters":
+          updatedList = toggleSelection(prevData.listCharacter, item);
+          return { ...prevData, listCharacter: updatedList };
+        default:
+          return prevData;
+      }
+    });
+  };
+
+  const getSelectedItems = () => {
+    switch (chooseType) {
+        case "categories":
+            return movie.listCate;
+        case "actors":
+            return movie.listActor;
+        case "characters":
+            return movie.listCharacter;
+        default:
+            return [];
+    }
+};
+
+  const toggleSelection = (list, item) => {
+    return list.includes(item)
+      ? list.filter((i) => i !== item)
+      : [...list, item];
+  };
+
   return (
     <div>
       <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
@@ -107,12 +146,17 @@ function Movie() {
         movie={movie}
         handleInput={handleInput}
         handleChoose={handleChoose}
+        categories={categories}
+        actors={actors}
+        characters={characters}
       />
       <ModalTest
         openModalTest={openModalTest}
         handleCloseModalTest={handleCloseModalTest}
         dataChoose={dataChoose}
         chooseType={chooseType}
+        handleSelect = {handleSelect}
+        dataSelected = {getSelectedItems()}
       />
     </div>
   );

@@ -44,9 +44,11 @@ function MovieModal({
   movie,
   handleInput,
   handleChoose,
+  categories,
+  actors,
+  characters
 }) {
   const [rent, setRent] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedActors, setSelectedActors] = useState([]);
   const [selectedCharacters, setSelectedCharacters] = useState([]);
   const handleRentChange = (event) => setRent(event.target.value);
@@ -173,24 +175,13 @@ function MovieModal({
                   </h3>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {[
-                    "Musical",
-                    "Action",
-                    "Drama",
-                    "Thriller",
-                    "Musical",
-                    "Action",
-                    "Drama",
-                    "Thriller",
-                  ].map((category) => (
+                  {movie.listCate.map((category) => (
                     <span
                       key={category}
                       variant="outlined"
-                      className={`relative bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400${selectedCategory.includes(
-                        category
-                      )}`}
+                      className={`relative bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400}`}
                     >
-                      {category}
+                      {getObjectById(category, categories)?.name}
                       <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
                     </span>
                   ))}
@@ -210,18 +201,11 @@ function MovieModal({
                 </div>
 
                 <div className="flex gap-2 flex-wrap">
-                  {["actor1", "actor2", "actor3"].map((actor) => (
-                    <div
-                      key={actor}
-                      className={`relative ${
-                        selectedActors.includes(actor)
-                          ? "bg-blue-500 text-white"
-                          : ""
-                      }`}
-                    >
+                  {movie.listActor.map((actor) => (
+                    <div key={actor} className="relative">
                       <img
-                        src="https://www.ohchr.org/sites/default/files/styles/hero_image_2/public/2021-07/Ethiopia-UN0418425.jpg?itok=7wJB8CbZ"
-                        alt={actor}
+                        src={getObjectById(actor, actors)?.imgUrl}
+                        alt=""
                         className="w-12 h-12 rounded-lg"
                       />
                       <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
@@ -242,27 +226,14 @@ function MovieModal({
                   </h3>
                 </div>
                 <div className="flex gap-2 flex-wrap ">
-                  {[
-                    "character1",
-                    "character2",
-                    "character3",
-                    "character1",
-                    "character2",
-                    "character3",
-                    "character1",
-                    "character2",
-                  ].map((character) => (
+                  {movie.listCharacter.map((character) => (
                     <div
                       key={character}
-                      className={`relative ${
-                        selectedCharacters.includes(character)
-                          ? "bg-blue-500 text-white"
-                          : ""
-                      }`}
+                     className="relative"
                     >
                       <img
-                        src="https://www.ohchr.org/sites/default/files/styles/hero_image_2/public/2021-07/Ethiopia-UN0418425.jpg?itok=7wJB8CbZ"
-                        alt={character}
+                        src={getObjectById(character, characters)?.imgUrl}
+                        alt=""
                         className="w-12 h-12 rounded-lg"
                       />
                       <TiDelete className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 text-red-500 bg-white rounded-full cursor-pointer hover:scale-110 transition duration-200" />
